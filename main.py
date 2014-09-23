@@ -1,13 +1,18 @@
-input_file = raw_input("Insert filename:")
+input_file = "morocco"
+#input_file = raw_input("Insert filename:")
 
 with open(input_file + ".txt", "r") as data:
 	lines = []
+	linesdict = {}
 	for line in data:
-		line = line.strip()
-		lines.append(line)
+		line = line.strip().split(",")
+		linecut = line[1]
+		lines.append(linecut)
+		#Make a dictionary 'linesdict' of the input file Key = place, value = text
+		linesdict[line[0]] = line[1]
 
-#http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Longest_common_substring#Python
 #Get longest substring of two strings.
+#http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Longest_common_substring#Python
 def longest_substring(s1, s2):
 	m = [[0] * (1 + len(s2)) for i in xrange(1 + len(s1))]
 	longest, x_longest = 0, 0
@@ -30,7 +35,7 @@ def iter_strings(data):
 		for index2, item2 in enumerate(data):
 			if index1 != index2:
 				x = longest_substring(data[index1], data[index2])
-				if len(x) >= 2:
+				if len(x) >= 3:
 					result.append(x)
 	return result
 
@@ -38,9 +43,25 @@ set_output = set(iter_strings(lines))
 list_output = list(set_output)
 ordered_list = list_output.sort(lambda y,x: cmp(len(x), len(y))) #Why does this work while the write function does not call ordered_list?
 
-f = open("output.txt", "w")
+#print linesdict
 
-for item in list_output:
-    f.write(str(item) + "\n")
+#print list_output
+
+#Create a dictionary that shows whether a substring occurs in an inscription
+#Right now it does not check if a certain string occurs in multiple inscriptions.
+def placedict(dct, string):
+	result = {}
+	for value in dct:
+		for line in string:
+			if line in dct[value]:
+				result.update({line:value})
+	return result
+
+final_dict = placedict(linesdict, list_output)
+
+f = open("outputdict.txt", "w")
+
+for key in final_dict.keys():
+	f.write(str(key) + ":" + str(final_dict[key] + "\n"))
 
 f.close()
